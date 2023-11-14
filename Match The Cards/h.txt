@@ -1,0 +1,124 @@
+;************************* SAISIE  ***********************
+mov word ptr[200h],62h
+mov word ptr[202h],0xFFh
+mov word ptr[204h],2Dh
+mov word ptr[206h],4Ch
+mov word ptr[208h],3Fh
+mov word ptr[20ah],0xF3h
+mov word ptr[20ch],15h
+mov word ptr[20eh],50h
+mov word ptr[210h],7Dh
+
+;mov byte ptr[200h],1
+;mov byte ptr[202h],2
+;mov byte ptr[204h],3
+;mov byte ptr[206h],4
+;mov byte ptr[208h],5
+;mov byte ptr[20ah],6
+;mov byte ptr[20ch],7
+;mov byte ptr[20eh],8
+;mov byte ptr[210h],9
+
+
+;************************* ADDITION   ***********************  
+mov si,0
+;mov bx,0
+mov ax,0
+;mov cx,9
+l1: add ax,[si+200h]
+;add ax,bx
+add si,2
+cmp si,12h
+jne l1
+;loop l1
+ 
+;*************************** Remplissage de la somme dans un tableau d'offset 218 ******************************  
+
+            ;nbre de lignes dans le tab d'offset initial 218
+mov bx,10          
+mov si,0              
+l2:mov dl,0          ;reste de la division
+div bx
+mov [218h+si],dl
+inc si              
+cmp ax,0              ;ax est vide (fin de la division) ou pas
+jne l2
+      ;***************************AFFICHAGE ******************************
+
+l3:dec si
+mov dl,[218h+si]
+add dl,30h             ; Code ASCII du zéro    utilisé pour l'affichage de caractére
+mov ah,2                ;Fonction d'affichage d'un caractere
+int 21h                    ;Interruption relative à l'affichage
+                 ;Fonction d'affichage d'un caractere
+                 
+cmp si,0
+jne l3
+int 20h              ;Appel au dos
+
+; multi-segment executable file template.
+
+
+
+
+
+
+assume cs:code, ds:data
+
+data segment
+;.  data 200h
+    null db 512 dup(0)
+     tab dw 0x62,0x0ff,0x2d,0x4c,0x3f,0xf3,0x15,0x50,0x7d
+    ;tab1 dw 9 dup(0)
+ends
+
+;stack segment
+;    dw   128  dup(0)
+;ends
+
+code segment
+start:
+   
+     
+    mov ax, data
+    mov ds, ax
+
+
+mov si,0
+mov bx,0
+mov ax,0
+mov cx,9
+l1: mov bx,tab[si]
+add ax,bx
+add si,2
+
+loop l1
+
+;*************************** Remplissage de la somme dans un tableau d'offset 218 ******************************  
+
+
+mov si,218h            ;nbre de lignes dans le tab d'offset initial 218
+mov bx,10                  
+l2: mov dl,0          ;reste de la division
+div bx
+mov [si],dl
+inc si              
+cmp ax,0              ;ax est vide (fin de la division) ou pas
+jne l2
+      ;***************************AFFICHAGE ******************************
+mov cx,4
+l3:dec si
+mov dl,[si]
+add dl,30h             ; Code ASCII du zéro    utilisé pour l'affichage de caractére
+mov ah,2                ;Fonction d'affichage d'un caractere
+int 21h                    ;Interruption relative à l'affichage
+                 ;Fonction d'affichage d'un caractere
+loop l3
+
+
+   
+    mov ax, 4c00h ; exit to operating system.
+    int 21h    
+ends
+
+end start ; set entry point and stop the assembler.
